@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HeaderCraft — Manage profiles</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="mark"></span>
+      <h1>HeaderCraft</h1>
+    </div>
+    <div class="actions">
+      <button id="export">Export profiles</button>
+      <label class="file-btn">
+        Import
+        <input type="file" id="import" accept="application/json" hidden />
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <button id="add-profile">+ New profile</button>
+      <ul id="profile-list"></ul>
+    </aside>
+    <section id="editor"></section>
+  </main>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

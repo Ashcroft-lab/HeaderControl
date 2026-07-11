@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="mark"></span>
+      <h1>HeaderCraft</h1>
+      <span id="header-count" class="count" hidden>0</span>
+    </div>
+    <div class="actions">
+      <button id="pause-toggle" type="button" class="icon-btn" title="Pause" aria-label="Pause">
+        <span id="pause-icon">⏸</span>
+      </button>
+      <button id="manage" type="button">Manage</button>
+    </div>
+  </header>
+  <p id="paused-banner" class="paused-banner" hidden>Paused — headers are not applied</p>
+  <ul id="profile-list"></ul>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
