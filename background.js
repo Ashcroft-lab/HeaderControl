@@ -25,7 +25,7 @@ async function syncRules() {
       addRules: rules,
     });
   } catch (err) {
-    console.warn("[HeaderCraft] Batch rule sync failed:", err);
+    console.warn("[HeaderControl] Batch rule sync failed:", err);
     if (removeRuleIds.length) {
       try {
         await chrome.declarativeNetRequest.updateDynamicRules({
@@ -42,7 +42,7 @@ async function syncRules() {
           addRules: [rule],
         });
       } catch (ruleErr) {
-        console.warn("[HeaderCraft] Skipped invalid rule:", rule, ruleErr);
+        console.warn("[HeaderControl] Skipped invalid rule:", rule, ruleErr);
       }
     }
   }

@@ -1,4 +1,4 @@
-# HeaderCraft
+# HeaderControl
 
 A Manifest V3 Chrome extension for adding, overriding, and removing HTTP
 request headers, organized into profiles (only one active at a time).
@@ -51,20 +51,17 @@ network stack enforces the rules even if the worker has gone idle.
   A header value can't be "a fresh UUID every request" — the closest
   approximation is having the service worker periodically rewrite a
   rule's value, which is coarser than real per-request generation.
-- **`append` only works on a fixed set of headers** (things like
-  `accept-encoding`, `cache-control`, `cookie`, `user-agent`,
-  `x-forwarded-for`). The UI doesn't currently block invalid combos —
-  worth adding validation before it trips someone up.
+- **Only `set` and `remove` operations.** Older profiles that used
+  `append` are treated as `set` when rules are compiled.
 - **No in-app "which rule matched" log.** Chrome's debug APIs for this
   (`onRuleMatchedDebug`, `getMatchedRules`, `testMatchOutcome`) only work
   on unpacked/dev-mode extensions, not once published. A real "test a
   URL against my rules" panel would need the `urlFilter` matching logic
   reimplemented in plain JS.
-- **Excluding a domain excludes its subdomains**, which is usually what
-  you want — but exclusion is matched against the request's *initiator*,
-  so a third-party resource embedded via iframe can behave differently
-  than a top-level navigation to the same domain. Worth keeping in mind
-  if exclude rules seem to "not work" on embedded content.
+- **Excluding a domain excludes its subdomains.** Domains are normalized
+  to hostnames and applied as both `excludedRequestDomains` and
+  `excludedInitiatorDomains`, so headers are skipped for requests to
+  those sites and for requests made from pages on those sites.
 - **Only one profile can be enabled at a time.** Enabling a profile turns
   the others off. You can also disable all of them.
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "HeaderCraft",
-  "version": "0.1.7",
+  "name": "HeaderControl",
+  "version": "0.1.19",
   "description": "Add, override, and remove request headers per profile.",
   "permissions": [
     "declarativeNetRequest",

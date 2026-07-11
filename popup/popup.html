@@ -8,7 +8,7 @@
   <header>
     <div class="brand">
       <span class="mark"></span>
-      <h1>HeaderCraft</h1>
+      <h1>HeaderControl</h1>
       <span id="header-count" class="count" hidden>0</span>
     </div>
     <div class="actions">
@@ -20,6 +20,13 @@
   </header>
   <p id="paused-banner" class="paused-banner" hidden>Paused — headers are not applied</p>
   <ul id="profile-list"></ul>
+  <section id="quick-edit" class="quick-edit" hidden>
+    <div class="quick-head">
+      <span id="edit-label">Headers</span>
+      <button id="add-header" type="button">+ Add</button>
+    </div>
+    <div id="header-rows"></div>
+  </section>
   <script type="module" src="popup.js"></script>
 </body>
 </html>
