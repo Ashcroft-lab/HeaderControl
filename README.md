@@ -1,77 +1,134 @@
-# HeaderControl
+<p align="center">
+  <img src="icons/icon128.png" alt="HeaderControl" width="96" height="96">
+</p>
 
-A Manifest V3 Chrome extension for adding, overriding, and removing HTTP
-request headers, organized into profiles (only one active at a time).
+<h1 align="center">HeaderControl</h1>
 
-## Load it in Chrome
+<p align="center">
+  <strong>Add, override, and remove HTTP request headers — organized into profiles.</strong>
+</p>
 
-1. Open `chrome://extensions`
-2. Turn on **Developer mode** (top right)
-3. Click **Load unpacked** and select this folder
-4. Click the extension icon to open the popup, or right-click → **Options**
-   to manage profiles
+<p align="center">
+  A Manifest V3 Chrome extension built on
+  <a href="https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest"><code>declarativeNetRequest</code></a>.
+  Rules run in Chrome’s network stack — the extension never sits in the request path and never reads your traffic.
+</p>
 
-Site access (`host_permissions: <all_urls>`) is granted when you load the
-extension, so header rules apply as soon as a profile is enabled — no extra
-runtime permission prompts.
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/headercontrol/ljopaddcofbllcmmbajkenhjeegoaclp"><img src="https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a>
+  <img src="https://img.shields.io/badge/Manifest-V3-0F9D58?style=flat-square" alt="Manifest V3">
+  <img src="https://img.shields.io/badge/version-0.1.20-6E56CF?style=flat-square" alt="Version 0.1.20">
+  <a href="https://subsequent-skateboard-0b8.notion.site/Privacy-Policy-for-HeaderControl-39aec9d0017080e1bf45ed54801ab724"><img src="https://img.shields.io/badge/Privacy-No_data_collected-555555?style=flat-square" alt="Privacy"></a>
+</p>
+
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/headercontrol/ljopaddcofbllcmmbajkenhjeegoaclp">Chrome Web Store</a>
+  ·
+  <a href="https://github.com/Ashcroft-lab/HeaderControl">GitHub</a>
+  ·
+  <a href="https://subsequent-skateboard-0b8.notion.site/Privacy-Policy-for-HeaderControl-39aec9d0017080e1bf45ed54801ab724">Privacy Policy</a>
+</p>
+
+---
+
+<p align="center">
+  <img src="docs/screenshots/popup.jpg" alt="HeaderControl popup — profiles and Authorization header" width="720">
+</p>
+
+## Features
+
+- **Profiles** — named header sets; only one profile is active at a time (or none)
+- **Set & remove** — override or strip request headers per profile
+- **URL scoping** — apply rules with a DNR `urlFilter` (default `*://*/*`)
+- **Domain exclusions** — skip specific hosts (and their use as initiators)
+- **Quick edit** — toggle profiles and edit headers from the toolbar popup
+- **Full editor** — Options page for filters, exclusions, and bulk management
+- **Import / export** — back up or share profiles as JSON
+- **Local-only** — everything stays in `chrome.storage`; nothing is sent off-device
+
+Built for developers swapping auth tokens, simulating CDN/backend headers, or debugging without touching server code.
+
+## Install
+
+### Chrome Web Store (recommended)
+
+[**Add HeaderControl from the Chrome Web Store**](https://chromewebstore.google.com/detail/headercontrol/ljopaddcofbllcmmbajkenhjeegoaclp)
+
+Extension ID: `ljopaddcofbllcmmbajkenhjeegoaclp`
+
+### Load unpacked (development)
+
+1. Clone this repo or download a release zip
+2. Open `chrome://extensions`
+3. Enable **Developer mode**
+4. Click **Load unpacked** and select this folder (the one with `manifest.json`)
+5. Open the toolbar popup, or right-click → **Options** to manage profiles
+
+When loaded unpacked, `host_permissions: <all_urls>` is granted with the install, so enabled profiles apply immediately.
+
+## How it works
+
+```
+Edit profile (popup / options)
+        │
+        ▼
+ chrome.storage.local
+        │  onChanged
+        ▼
+ background service worker
+        │  compileRules()
+        ▼
+ declarativeNetRequest dynamic rules
+        │
+        ▼
+ Chrome network stack enforces headers
+```
+
+After rules are installed, the service worker does not need to stay awake — Chrome applies them natively.
+
+`lib/rule-compiler.js` has no `chrome.*` calls: it is a pure `profiles → rules` function and is straightforward to unit test.
 
 ## Project structure
 
 ```
-manifest.json          MV3 manifest — permissions, entry points
+manifest.json          MV3 manifest — permissions & entry points
 background.js          Service worker: recompiles rules on storage change
 lib/
-  storage.js            get/set profiles, export/import, id generation
-  rule-compiler.js       pure function: profiles -> declarativeNetRequest rules
-popup/                  Quick-toggle list, opens on icon click
-options/                Full profile editor: headers, filters, import/export
-icons/                  Generated placeholder icons (swap for a real mark)
+  storage.js           Profiles, export/import, id generation
+  rule-compiler.js     Pure compiler: profiles → DNR rules
+  common-headers.js    Autocomplete hints for header names
+popup/                 Quick toggle & inline header edit
+options/               Full profile editor, filters, import/export
+icons/                 Extension icons
+scripts/pack.sh        Build the store zip → dist/
 ```
 
-`lib/rule-compiler.js` has no `chrome.*` calls in it — it's a plain
-function you can unit test without a browser. Everything else is thin
-glue around it and around `chrome.storage`.
+## Privacy
 
-## How a profile becomes browser behavior
+HeaderControl does **not** collect, sell, or transmit personal data. Profiles and rules stay on your device in Chrome local storage. There are no content scripts and no remote code.
 
-1. You edit a profile in the popup or options page → written to
-   `chrome.storage.local`
-2. `chrome.storage.onChanged` wakes the service worker
-3. `compileRules()` turns all enabled profiles into
-   `declarativeNetRequest` rule JSON
-4. `chrome.declarativeNetRequest.updateDynamicRules()` hands that to
-   Chrome
+Full statement: [Privacy Policy](https://subsequent-skateboard-0b8.notion.site/Privacy-Policy-for-HeaderControl-39aec9d0017080e1bf45ed54801ab724)
 
-After step 4, the service worker isn't involved anymore — Chrome's own
-network stack enforces the rules even if the worker has gone idle.
+## Packaging & release
 
-## Known limitations (by design, not bugs)
+```bash
+./scripts/pack.sh
+```
 
-- **No true per-request dynamic values.** Rule values are static JSON.
-  A header value can't be "a fresh UUID every request" — the closest
-  approximation is having the service worker periodically rewrite a
-  rule's value, which is coarser than real per-request generation.
-- **Only `set` and `remove` operations.** Older profiles that used
-  `append` are treated as `set` when rules are compiled.
-- **No in-app "which rule matched" log.** Chrome's debug APIs for this
-  (`onRuleMatchedDebug`, `getMatchedRules`, `testMatchOutcome`) only work
-  on unpacked/dev-mode extensions, not once published. A real "test a
-  URL against my rules" panel would need the `urlFilter` matching logic
-  reimplemented in plain JS.
-- **Excluding a domain excludes its subdomains.** Domains are normalized
-  to hostnames and applied as both `excludedRequestDomains` and
-  `excludedInitiatorDomains`, so headers are skipped for requests to
-  those sites and for requests made from pages on those sites.
-- **Only one profile can be enabled at a time.** Enabling a profile turns
-  the others off. You can also disable all of them.
+Writes `dist/HeaderControl-<version>.zip` from `manifest.json` `version`.
 
-## Before publishing this for real
+Maintainer notes (CI, draft store upload, secrets): [`.github/RELEASING.md`](.github/RELEASING.md)
 
-- Swap the generated icons for a real mark
-- Write an actual privacy policy (even "we collect nothing" needs to be
-  stated, not implied)
-- Keep permissions as narrow as practical — `<all_urls>` is required for
-  header modification across sites; resist adding `scripting` unless a
-  specific feature truly needs it
-- Nothing in this codebase fetches or evals remote code, and Manifest V3
-  won't let a future update add that quietly — keep it that way
+## References
+
+- [Chrome Web Store listing](https://chromewebstore.google.com/detail/headercontrol/ljopaddcofbllcmmbajkenhjeegoaclp)
+- [chrome.declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)
+- [Modify headers with DNR](https://developer.chrome.com/docs/extensions/develop/concepts/network-requests#modify)
+- [Manifest V3 overview](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
+- [Chrome Web Store API (publishing)](https://developer.chrome.com/docs/webstore/using_webstore_api/)
+
+---
+
+<p align="center">
+  <sub>Made for developers · <a href="https://github.com/Ashcroft-lab/HeaderControl">Ashcroft-lab/HeaderControl</a></sub>
+</p>
