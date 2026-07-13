@@ -7,3 +7,4 @@ node_modules/
 *.crx
 *.pem
 graphify-out/
+dist/
