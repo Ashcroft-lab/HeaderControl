@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
+          package-manager-cache: false
 
       - name: Validate manifest.json
         run: |
@@ -37,7 +38,7 @@ jobs:
           echo "zip=dist/HeaderControl-${VERSION}.zip" >> "$GITHUB_OUTPUT"
 
       - name: Upload zip artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: HeaderControl-${{ steps.pack.outputs.version }}
           path: ${{ steps.pack.outputs.zip }}
