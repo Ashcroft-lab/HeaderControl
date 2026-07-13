@@ -1,0 +1,55 @@
+name: Release Chrome Web Store (draft)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  upload-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Validate manifest.json
+        run: |
+          node -e "
+            const m = require('./manifest.json');
+            if (m.manifest_version !== 3) throw new Error('manifest_version must be 3');
+            if (!m.version) throw new Error('version is required');
+            console.log('Packaging', m.name, m.version);
+          "
+
+      - name: Pack extension zip
+        id: pack
+        run: |
+          chmod +x scripts/pack.sh
+          ./scripts/pack.sh
+          VERSION="$(node -p "JSON.parse(require('fs').readFileSync('manifest.json','utf8')).version")"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "zip=dist/HeaderControl-${VERSION}.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: HeaderControl-${{ steps.pack.outputs.version }}
+          path: ${{ steps.pack.outputs.zip }}
+          if-no-files-found: error
+
+      - name: Upload draft to Chrome Web Store
+        uses: wdzeng/chrome-extension@v1
+        with:
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          zip-path: ${{ steps.pack.outputs.zip }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          upload-only: true
