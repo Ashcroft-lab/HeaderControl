@@ -25,11 +25,12 @@ Extension id: `ljopaddcofbllcmmbajkenhjeegoaclp`
 
 ## Release steps
 
-1. Bump `version` in `manifest.json` (must be higher than the live store version).
-2. Commit and merge to `main` (or tag the commit you want).
-3. Tag and push: `git tag v0.1.20 && git push origin v0.1.20`
-4. Wait for **Release Chrome Web Store (draft)** to finish.
-5. In the Dashboard → publish / submit for review.
+1. Move items from **Unreleased** into a new dated section in [`CHANGELOG.md`](../CHANGELOG.md).
+2. Bump `version` in `manifest.json` (must be higher than the live store version) and update the README version badge.
+3. Commit and merge to `main` (or tag the commit you want).
+4. Tag and push: `git tag v0.1.21 && git push origin v0.1.21`
+5. Wait for **Release Chrome Web Store (draft)** to finish.
+6. In the Dashboard → publish / submit for review.
 
 ## Repository secrets (Actions)
 

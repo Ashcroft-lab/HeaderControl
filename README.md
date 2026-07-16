@@ -17,7 +17,7 @@
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/headercontrol/ljopaddcofbllcmmbajkenhjeegoaclp"><img src="https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a>
   <img src="https://img.shields.io/badge/Manifest-V3-0F9D58?style=flat-square" alt="Manifest V3">
-  <img src="https://img.shields.io/badge/version-0.1.20-6E56CF?style=flat-square" alt="Version 0.1.20">
+  <img src="https://img.shields.io/badge/version-0.1.21-6E56CF?style=flat-square" alt="Version 0.1.21">
   <a href="https://subsequent-skateboard-0b8.notion.site/Privacy-Policy-for-HeaderControl-39aec9d0017080e1bf45ed54801ab724"><img src="https://img.shields.io/badge/Privacy-No_data_collected-555555?style=flat-square" alt="Privacy"></a>
 </p>
 
