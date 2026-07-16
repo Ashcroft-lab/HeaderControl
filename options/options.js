@@ -18,6 +18,11 @@ let selectedId = null;
 const listEl = document.getElementById("profile-list");
 const editorEl = document.getElementById("editor");
 
+const versionEl = document.getElementById("ext-version");
+if (versionEl) {
+  versionEl.textContent = `v${chrome.runtime.getManifest().version}`;
+}
+
 async function load() {
   const raw = await getProfiles();
   profiles = normalizeAtMostOneEnabled(raw);
